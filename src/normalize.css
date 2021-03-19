@@ -53,3 +53,33 @@ a {
   color: inherit;
   text-decoration: inherit;
 }
+
+.lead {
+  background-color: #ff6e63;
+  border-radius: 8px;
+  color: white;
+  font-weight: 500;
+  margin-left: 4px;
+  padding: 2px 4px;
+}
+
+.lead-list {
+  background-color: #ff6e63;
+  border-radius: 8px;
+  padding: 2px 4px;
+  color: white;
+  font-size: 10px;
+}
+
+.Igw0E.IwRSH.eGOV_.ybXk5._4EzTm {
+  align-items: center;
+}
+
+.lead-empty {
+  border-radius: 8px;
+  padding: 2px 4px;
+  color: black;
+  font-size: 10px;
+  border: 1px dotted #c4c4c4;
+  margin-left: 4px;
+}

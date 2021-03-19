@@ -1,19 +1,18 @@
 const path = require('path')
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
 
 const config = {
   entry: {
-    background: './src/background.tsx',
-    inject: './src/inject.tsx',
-    popover: './src/popover.tsx',
-    iframe: './src/iframe.tsx',
-    embed: './src/embed.tsx',
-    code: './src/code.tsx',
+    index: './src/index.tsx',
+    background: './src/background.tsx'
   },
   output: {
     filename: '[name].js',
+    publicPath: '',
     path: path.resolve(__dirname, 'build')
   },
+  devtool: 'cheap-module-source-map',
   module: {
     rules: [
       {
@@ -24,45 +23,37 @@ const config = {
       {
         use: 'babel-loader',
         test: /\.jsx?$/
+      },
+      {
+        use: 'css-loader',
+        test: /\.css$/i
       }
     ]
   },
-  node: {
-    dgram: 'empty',
-    fs: 'empty',
-    net: 'empty',
-    tls: 'empty',
-    child_process: 'empty',
-  },
   plugins: [
-    new CopyWebpackPlugin([{
-      from: './src/popover.html',
-      to: 'popover.html'
-    }]),
-    new CopyWebpackPlugin([{
-      from: './src/iframe.html',
-      to: 'iframe.html'
-    }]),
-    new CopyWebpackPlugin([{
-      from: './src/manifest.json',
-      to: 'manifest.json'
-    }]),
-    new CopyWebpackPlugin([{
-      from: './src/img',
-      to: 'img'
-    }]),
-    new CopyWebpackPlugin([{
-      from: './src/normalize.css',
-      to: 'normalize.css'
-    }]),
-    new CopyWebpackPlugin([{
-      from: './src/fonts',
-      to: 'fonts'
-    }]),
-    new CopyWebpackPlugin([{
-      from: './src/code.html',
-      to: 'code.html'
-    }])
+    new CopyPlugin({
+      patterns: [
+        { from: './src/manifest.json', to: 'manifest.json' },
+        // { from: './src/img', to: 'img' },
+        // { from: './src/fonts', to: 'fonts' },
+        { from: './src/normalize.css', to: 'normalize.css' }
+      ]
+    }),
+    new CopyPlugin({
+      patterns: [
+          { from: 'src/img', to: 'img' }
+      ]
+    }),
+    // https://stackoverflow.com/questions/64475910/replacing-polyfill-for-process-in-webpack-v5-from-v4
+    new webpack.DefinePlugin({
+      'process.env.NODE_DEBUG': JSON.stringify(process.env.NODE_DEBUG),
+      'process.type': JSON.stringify(process.type),
+      'process.version': JSON.stringify(process.version),
+      'process.env.npm_package_version': JSON.stringify(process.version),
+      'process': {
+        env: {}
+      }
+    })
   ],
   resolve: {
     alias: {

@@ -1,35 +1,56 @@
+// {
+//   "compileOnSave": false,
+//   "compilerOptions": {
+//     "allowSyntheticDefaultImports": true,
+//     // TODO: remove after resolving compliance
+//     "allowUnreachableCode": true,
+//     "target": "es2016",
+//     "module": "es2015",
+//     "moduleResolution": "node",
+//     "jsx": "react",
+//     "allowJs": true,
+//     "sourceMap": true,
+//     "baseUrl": ".",
+//     "lib": ["ES2015", "ES2016", "DOM", "DOM.Iterable", "ScriptHost"],
+//     "noErrorTruncation": true,
+//     "paths": {
+//       "src": ["./src"],
+//       "src/*": ["./src/*"],
+//       "lib/*": ["./src/lib/*"],
+//       "int64Util": ["./node_modules/thrift/lib/nodejs/lib/thrift/int64_util"]
+//     },
+//     "types": ["chrome"]
+//   },
+//   "exclude": [
+//     "node_modules",
+//     "**/*.spec.ts",
+//     "./build/**",
+//     "./bin/**"
+//   ]
+// }
+
 {
-    "compileOnSave": false,
-    "compilerOptions": {
-      "allowSyntheticDefaultImports": true,
-      // TODO: remove after resolving compliance
-      "allowUnreachableCode": true,
-      "target": "es2016",
-      "module": "es2015",
-      "moduleResolution": "node",
-      "jsx": "react",
-      "allowJs": true,
-      "sourceMap": true,
-      "baseUrl": ".",
-      "lib": ["ES2015", "ES2016", "DOM", "DOM.Iterable", "ScriptHost"],
-      "noErrorTruncation": true,
-      "paths": {
-        "reddit/*": ["./src/*"],
-        "reddit": ["./src"],
-        "src": ["./src"],
-        "src/*": ["./src/*"],
-        "lib/*": ["./src/lib/*"],
-        "telemetry": ["./src/telemetry"],
-        "telemetry/*": ["./src/telemetry/*"],
-        "int64Util": ["./node_modules/thrift/lib/nodejs/lib/thrift/int64_util"]
-      },
-      "types": ["chrome"]
-    },
-    "exclude": [
-      "node_modules",
-      "**/*.spec.ts",
-      "./build/**",
-      "./bin/**"
-    ]
-  }
-  
+  "compilerOptions": {
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "src"
+  ]
+}

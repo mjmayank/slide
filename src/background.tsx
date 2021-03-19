@@ -1,15 +1,21 @@
-import { wrapStore } from 'webext-redux';
-import { applyMiddleware, createStore } from 'redux';
-import ReduxThunk from 'redux-thunk';
-import reducers from './background_reducers';
-import {
-  STORE_NAME,
-} from './constants';
+const COMPLETE = "complete"; // Based on chrome spec. Don't change!
 
-console.log( 'Background.html starting!' );
-/*Put page action icon on all tabs*/
+const URL_UPDATED_EVENT = "EVENT__URL_UPDATED";
+const DATA_RECEIVED = "EVENT__DATA_RECEIVED";
 
-const store = createStore(reducers, applyMiddleware(ReduxThunk)); // a normal Redux store
-wrapStore(store, { portName: STORE_NAME }); // make sure portName matches
+export { }
 
-console.log( 'Background.html done.' );
+// update on URL update
+chrome.tabs.onUpdated.addListener(function (tabId, change, tab) {
+  console.log('outside');
+  if (change && change.status === COMPLETE) {
+    console.log('inside');
+    chrome.tabs.sendMessage(
+      tabId,
+      {
+        name: URL_UPDATED_EVENT,
+      },
+      {}
+    );
+  }
+});
