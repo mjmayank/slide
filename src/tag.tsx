@@ -1,42 +1,104 @@
 import { useState, useContext } from 'react';
 import { Dialog } from 'evergreen-ui';
+import ColorHash from 'color-hash';
 
 import {
   addToAirtable,
-  StateContext
+  transcribeAirtableToKeyFields,
+  StateContext,
+  getContrast,
 } from './index';
+import LeadForm from './LeadForm.tsx';
 
 interface Props {
   list?: boolean;
   username: string;
-  status?: string | null;
+  record?: Record<string, any>;
 }
 
 function App(props:Props) {
-  const [isShown, setIsShown] = useState(false);
-  const { } = useContext(StateContext);
+  const record = props.record ? transcribeAirtableToKeyFields(props.record) : {};
 
-  if (props.status) {
+  const [isShown, setIsShown] = useState(false);
+  const [notes, setNotes] = useState(record.notes || '');
+  const [leadType, setLeadType] = useState(record.status || 'Hot Lead - Requires Attn');
+  const [programMatch, setProgramMatch] = useState<string | null>(record.programMatch || null);
+  const [valuePieceSent, setValuePieceSent] = useState<string | null>(record.valuePieceSent || null);
+  const { data } = useContext(StateContext);
+
+  if (record.status) {
+    var colorHash = new ColorHash();
+    const bgColor = colorHash.hex(record.status);
+    const textColor = getContrast(bgColor);
+    const style = {
+      color: textColor,
+      backgroundColor: bgColor,
+    }
     return (
-      <div className={ props.list ? "lead-list" : "lead" }>{ props.status }</div>
+      <StateContext.Consumer>
+        { (({data, setData}) => (
+          <div>
+            <Dialog
+              isShown={isShown}
+              title={ `Add ${props.username} to Airtable` }
+              onCloseComplete={() => setIsShown(false)}
+              onConfirm={ () => { addToAirtable(props.username, notes, leadType, programMatch, valuePieceSent); setIsShown(false); setData(props.username, { 'status': leadType } ); } }
+            >
+              <LeadForm
+                username={ props.username }
+                notes={ notes }
+                leadType={ leadType }
+                programMatch={ programMatch }
+                valuePieceSent={ valuePieceSent }
+                setNotes={ setNotes }
+                setLeadType={ setLeadType }
+                setProgramMatch={ setProgramMatch }
+                setValuePieceSent={ setValuePieceSent }
+              />
+            </Dialog>
+            <button
+              onClick={ () => setIsShown(true) }
+              className={ props.list ? "lead-list" : "lead" }
+              style={ style }
+            >
+              { record.status }
+            </button>
+          </div>
+        ))}
+      </StateContext.Consumer>
     );
   } else {
     return (
-      <div>
-        <Dialog
-          isShown={isShown}
-          title="Loading confirmation"
-          onCloseComplete={() => setIsShown(false)}
-        >
-          Dialog content
-        </Dialog>
-        <div
-          onClick={ e => { e.preventDefault(); addToAirtable(props.username); setIsShown(true); } }
-          className="lead-empty"
-        >
-          Add to Airtable
-        </div>
-      </div>
+      <StateContext.Consumer>
+        { (({data, setData}) => (
+          <div>
+            <Dialog
+              isShown={isShown}
+              title={ `Add ${props.username} to Airtable` }
+              onCloseComplete={() => setIsShown(false)}
+              onConfirm={ () => { addToAirtable(props.username, notes, leadType, programMatch, valuePieceSent); setIsShown(false); setData(props.username, { 'status': leadType } ); } }
+            >
+              <LeadForm
+                username={ props.username }
+                notes={ notes }
+                leadType={ leadType }
+                programMatch={ programMatch }
+                valuePieceSent={ valuePieceSent }
+                setNotes={ setNotes }
+                setLeadType={ setLeadType }
+                setProgramMatch={ setProgramMatch }
+                setValuePieceSent={ setValuePieceSent }
+              />
+            </Dialog>
+            <button
+              onClick={ () => setIsShown(true) }
+              className="lead-empty"
+            >
+              Add to Airtable
+            </button>
+          </div>
+        ))}
+      </StateContext.Consumer>
     )
   }
 }

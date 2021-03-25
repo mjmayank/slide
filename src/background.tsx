@@ -7,7 +7,8 @@ export { }
 
 // update on URL update
 chrome.tabs.onUpdated.addListener(function (tabId, change, tab) {
-  console.log('outside');
+  console.log('URL update');
+  console.log(change)
   if (change && change.status === COMPLETE) {
     console.log('inside');
     chrome.tabs.sendMessage(
@@ -19,3 +20,18 @@ chrome.tabs.onUpdated.addListener(function (tabId, change, tab) {
     );
   }
 });
+
+chrome.webRequest.onCompleted.addListener((details) => {
+  console.log('network request');
+  console.log(details);
+  if (details) {
+    console.log('inside');
+    chrome.tabs.sendMessage(
+      details.tabId,
+      {
+        name: URL_UPDATED_EVENT,
+      },
+      {}
+    );
+  }
+}, { urls: ['https://i.instagram.com/api/v1/direct_v2/inbox/*'] })

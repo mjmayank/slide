@@ -58,9 +58,9 @@ a {
   background-color: #ff6e63;
   border-radius: 8px;
   color: white;
-  font-weight: 500;
-  margin-left: 4px;
-  padding: 2px 4px;
+  font-weight: 400;
+  margin-left: 8px;
+  padding: 2px 8px;
 }
 
 .lead-list {
@@ -79,7 +79,30 @@ a {
   border-radius: 8px;
   padding: 2px 4px;
   color: black;
+  cursor: pointer;
   font-size: 10px;
   border: 1px dotted #c4c4c4;
-  margin-left: 4px;
+  margin-left: 12px;
+}
+
+.Igw0E.IwRSH.eGOV_.ui_ht.n4cjz {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+button.saveLead {
+  margin-top: 8px;
+  background-color: #cceecc;
+  border-radius: 4px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.ub-dspl_flex {
+  flex-direction: row;
+}
+
+.ub-box-szg_border-box {
+  display: block;
 }
