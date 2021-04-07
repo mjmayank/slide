@@ -2,16 +2,13 @@
   "short_name": "Slide",
   "name": "Slide - A Lead Tracker for Instagram",
   "description": "Integrates directly with Instagram for easy lead tracking",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "manifest_version": 2,
   "permissions": [
     "storage",
-    "tabs",
-    "activeTab",
     "webRequest",
-    "webRequestBlocking",
-    "http://*/*", 
-    "https://*/*"
+    "https://*.instagram.com/*", 
+    "http://*.instagram.com/*"
   ],
   "background": {
     "scripts": ["background.js"]
@@ -24,7 +21,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.instagram.com/direct/*"],
+      "matches": ["*://*.instagram.com/*"],
       "js": ["index.js"],
       "css": ["normalize.css"]
     }

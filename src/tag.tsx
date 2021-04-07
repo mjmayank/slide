@@ -1,10 +1,8 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { Dialog } from 'evergreen-ui';
 import ColorHash from 'color-hash';
 
 import {
-  addToAirtable,
-  transcribeAirtableToKeyFields,
   StateContext,
   getContrast,
 } from './index';
@@ -14,17 +12,20 @@ interface Props {
   list?: boolean;
   username: string;
   record?: Record<string, any>;
+  addToAirtable(username:string, data: Record<string, any>): void;
 }
 
 function App(props:Props) {
-  const record = props.record ? transcribeAirtableToKeyFields(props.record) : {};
+  const record: Record<string, any> = props.record ? props.record : {};
 
   const [isShown, setIsShown] = useState(false);
+  const [name, setName] = useState(record.name || '');
   const [notes, setNotes] = useState(record.notes || '');
   const [leadType, setLeadType] = useState(record.status || 'Hot Lead - Requires Attn');
   const [programMatch, setProgramMatch] = useState<string | null>(record.programMatch || null);
   const [valuePieceSent, setValuePieceSent] = useState<string | null>(record.valuePieceSent || null);
-  const { data } = useContext(StateContext);
+
+  const { addToAirtable } = props;
 
   if (record.status) {
     var colorHash = new ColorHash();
@@ -42,14 +43,16 @@ function App(props:Props) {
               isShown={isShown}
               title={ `Add ${props.username} to Airtable` }
               onCloseComplete={() => setIsShown(false)}
-              onConfirm={ () => { addToAirtable(props.username, notes, leadType, programMatch, valuePieceSent); setIsShown(false); setData(props.username, { 'status': leadType } ); } }
+              onConfirm={ () => { addToAirtable(props.username, { name, notes, leadType, programMatch, valuePieceSent }); setIsShown(false); setData(props.username, { 'status': leadType } ); } }
             >
               <LeadForm
                 username={ props.username }
+                name={ name }
                 notes={ notes }
                 leadType={ leadType }
                 programMatch={ programMatch }
                 valuePieceSent={ valuePieceSent }
+                setName={ setName }
                 setNotes={ setNotes }
                 setLeadType={ setLeadType }
                 setProgramMatch={ setProgramMatch }
@@ -76,14 +79,16 @@ function App(props:Props) {
               isShown={isShown}
               title={ `Add ${props.username} to Airtable` }
               onCloseComplete={() => setIsShown(false)}
-              onConfirm={ () => { addToAirtable(props.username, notes, leadType, programMatch, valuePieceSent); setIsShown(false); setData(props.username, { 'status': leadType } ); } }
+              onConfirm={ () => { addToAirtable(props.username, { name, notes, leadType, programMatch, valuePieceSent }); setIsShown(false); setData(props.username, { 'status': leadType } ); } }
             >
               <LeadForm
+                name={ name }
                 username={ props.username }
                 notes={ notes }
                 leadType={ leadType }
                 programMatch={ programMatch }
                 valuePieceSent={ valuePieceSent }
+                setName={ setName }
                 setNotes={ setNotes }
                 setLeadType={ setLeadType }
                 setProgramMatch={ setProgramMatch }

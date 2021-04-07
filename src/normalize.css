@@ -106,3 +106,16 @@ button.saveLead {
 .ub-box-szg_border-box {
   display: block;
 }
+
+.lead-section {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.lead-label {
+  margin-bottom: 2px;
+}
+
+.onboarding-list-item {
+  margin: 8px;
+}
