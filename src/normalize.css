@@ -117,5 +117,10 @@ button.saveLead {
 }
 
 .onboarding-list-item {
-  margin: 8px;
+  margin: 16px 8px;
+}
+
+.setup-button {
+  color: white!important;
+  margin-top: 4px;
 }

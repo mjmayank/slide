@@ -81,12 +81,17 @@ export const transcribeAirtableToKeyFields = (record:Record<string, any>) => {
 }
 
 let renderInList = () => {
-  ReactDOM.render(
-    <React.StrictMode>
-      <Main finalRecords={ finalRecords }/>
-    </React.StrictMode>,
-    document.querySelector('._7UhW9.vy6Bb.qyrsm.KV-D4.fDxYl.T0kll'),
-  );
+  const node = document.querySelector('body');
+  if (node) {
+    const root = node.appendChild(document.createElement('div'));
+    root.id = 'react-root'
+    ReactDOM.render(
+      <React.StrictMode>
+        <Main finalRecords={ finalRecords }/>
+      </React.StrictMode>,
+      root,
+    );
+  }
 }
 
 setTimeout(() => {

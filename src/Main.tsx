@@ -8,9 +8,9 @@ import Tag from './tag.tsx';
 import Setup from './Setup';
 import { Dialog } from 'evergreen-ui';
 
-const AIRTABLE_SECRET = 'keyrCJgTKaSw8FM3o';
 const AIRTABLE_API_KEY = 'airtable_private_key';
 const AIRTABLE_BASE_ID_KEY = 'airtable_base'
+const EMAIL_ADDRESS_KEY = 'slide_email_address'
 
 const MONTHS = [
   'January',
@@ -38,6 +38,7 @@ interface State {
   baseId: string;
   currentUser: string;
   data: Record<string, AirtableRecord>;
+  emailAddress: string;
   setData(username: string, value: AirtableRecord): void; 
   username: string | null;
   isOnboardingShown: boolean;
@@ -51,18 +52,25 @@ export default class App extends React.Component<Props, State> {
   constructor(props: Props){
     super(props);
 
-    const currentUser = document.querySelector('._7UhW9.vy6Bb.qyrsm.KV-D4.fDxYl.T0kll')?.textContent || '';
+    chrome.storage.sync.get(EMAIL_ADDRESS_KEY, result => {
+      if (currentUser) {
+        amplitude.getInstance().init("12a0fcd83ce36edfd172d32a8a927bb9", result[EMAIL_ADDRESS_KEY]);
+      } else {
+        amplitude.getInstance().init("12a0fcd83ce36edfd172d32a8a927bb9");
+      }
+    });
 
-    if (currentUser) {
-      amplitude.getInstance().init("12a0fcd83ce36edfd172d32a8a927bb9", currentUser);
-    } else {
-      amplitude.getInstance().init("12a0fcd83ce36edfd172d32a8a927bb9");
-    }
+    // chrome.storage.sync.remove([AIRTABLE_API_KEY, AIRTABLE_BASE_ID_KEY, EMAIL_ADDRESS_KEY], () => {})
+
+    const currentUser = document.querySelector('._7UhW9.vy6Bb.qyrsm.KV-D4.fDxYl.T0kll')?.textContent
+      || document.querySelector('a.gmFkV')?.textContent
+      || '';
 
     this.state = {
       apiKey: '',
       baseId: '',
       data: props.finalRecords,
+      emailAddress: '',
       setData: this.setData,
       username: null,
       currentUser,
@@ -80,6 +88,10 @@ export default class App extends React.Component<Props, State> {
   setApiKey = (value: string) => {
     this.setState(state => ({ ...state, apiKey: value }));
     console.log(value);
+  }
+
+  setEmailAddress = (value: string) => {
+    this.setState(state => ({ ...state, emailAddress: value }));
   }
 
   setAirtableBaseId = (result:ChromeSyncResult) => {
@@ -105,21 +117,31 @@ export default class App extends React.Component<Props, State> {
   }
 
   initializeAirtable = () => {
-    chrome.storage.sync.get(AIRTABLE_API_KEY, this.setAirtableApiKey);
-    chrome.storage.sync.get([AIRTABLE_BASE_ID_KEY], this.setAirtableBaseId);
-    this.initialQuery();
+    chrome.storage.sync.get(AIRTABLE_API_KEY, result => {
+      this.setAirtableApiKey(result);
+      chrome.storage.sync.get([AIRTABLE_BASE_ID_KEY], result => {
+        this.setAirtableBaseId(result);
+        this.initialQuery();
+      });
+    });
   }
 
-  saveAirtableValues = (apiKey: string, baseId: string) => {
+  saveAirtableValues = (apiKey: string, baseId: string, emailAddress: string) => {
     console.log(apiKey, baseId);
-    chrome.storage.sync.set({ [AIRTABLE_API_KEY]: apiKey, [AIRTABLE_BASE_ID_KEY]: baseId }, () => {
+    chrome.storage.sync.set({
+      [AIRTABLE_API_KEY]: apiKey,
+      [AIRTABLE_BASE_ID_KEY]: baseId,
+      [EMAIL_ADDRESS_KEY]: emailAddress,
+    },
+    () => {
       this.initializeAirtable();
       this.setState(state => ({ ...state, isOnboardingShown: false }));
+      amplitude.getInstance().setUserId(emailAddress);
     })
   }
 
   componentDidMount() {
-    amplitude.getInstance().logEvent('viewed_instagram');
+    amplitude.getInstance().logEvent('viewed_instagram', { 'url': window.location.href, 'username': this.state.currentUser });
     this.initializeAirtable();
     chrome.runtime.onMessage.addListener(this.handleMessage);
 
@@ -206,11 +228,18 @@ export default class App extends React.Component<Props, State> {
         this.initialQuery();
         //often times the URL will change while the page is still rendering
         const usernameNode = document.querySelector('.Igw0E.IwRSH.eGOV_.ybXk5._4EzTm')
+        let currentUser = this.state.currentUser;
+        if(!this.state.currentUser) {
+          currentUser = document.querySelector('._7UhW9.vy6Bb.qyrsm.KV-D4.fDxYl.T0kll')?.textContent
+            || document.querySelector('a.gmFkV')?.textContent
+            || '';
+        }
         const username = usernameNode?.textContent;
         if (username) {
           this.setState(state => ({
             ...state,
             username,
+            currentUser,
           }));
         }
       }
@@ -261,7 +290,7 @@ export default class App extends React.Component<Props, State> {
     if (!this.base) {
       return;
     }
-    amplitude.getInstance().logEvent('update_in_airtable');
+    amplitude.getInstance().logEvent('update_in_airtable', { 'url': window.location.href, 'username': this.state.currentUser });
     this.base('Table 1').update([
       {
         "id": this.state.data[username].id,
@@ -296,7 +325,7 @@ export default class App extends React.Component<Props, State> {
     if (this.state.data[username]) {
       return this.updateInAirtable(username, notes, leadType, programMatch, valuePieceSent);
     }
-    amplitude.getInstance().logEvent('add_to_airtable');
+    amplitude.getInstance().logEvent('add_to_airtable', { 'url': window.location.href, 'username': this.state.currentUser });
   
     var today = new Date();
     var followUp = new Date();
@@ -336,6 +365,7 @@ export default class App extends React.Component<Props, State> {
     const {
       apiKey,
       baseId,
+      emailAddress,
       isOnboardingShown,
       username,
     } = this.state;
@@ -348,9 +378,16 @@ export default class App extends React.Component<Props, State> {
             isShown={ isOnboardingShown }
             title="Set up your connection to Airtable"
             onCloseComplete={() => { this.setState(state => ({ isOnboardingShown: false })) } }
-            onConfirm={ () => this.saveAirtableValues(apiKey, baseId) }
+            onConfirm={ () => this.saveAirtableValues(apiKey, baseId, emailAddress) }
           >
-            <Setup apiKey={ apiKey } baseId={ baseId } setApiKey={ this.setApiKey } setBaseId={ this.setBaseId }/>
+            <Setup
+              apiKey={ apiKey }
+              baseId={ baseId }
+              emailAddress={ emailAddress }
+              setApiKey={ this.setApiKey }
+              setBaseId={ this.setBaseId }
+              setEmailAddress={ this.setEmailAddress }
+            />
           </Dialog> }
         {
           usernames.map(username => {
