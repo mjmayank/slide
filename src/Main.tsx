@@ -82,12 +82,10 @@ export default class App extends React.Component<Props, State> {
 
   setBaseId = (value: string) => {
     this.setState(state => ({ ...state, baseId: value }));
-    console.log(value);
   }
 
   setApiKey = (value: string) => {
     this.setState(state => ({ ...state, apiKey: value }));
-    console.log(value);
   }
 
   setEmailAddress = (value: string) => {
@@ -127,7 +125,6 @@ export default class App extends React.Component<Props, State> {
   }
 
   saveAirtableValues = (apiKey: string, baseId: string, emailAddress: string) => {
-    console.log(apiKey, baseId);
     chrome.storage.sync.set({
       [AIRTABLE_API_KEY]: apiKey,
       [AIRTABLE_BASE_ID_KEY]: baseId,
@@ -167,7 +164,6 @@ export default class App extends React.Component<Props, State> {
   recordState = (record:any) => {
     const username = record.get('IG Handle');
     const transcribedRecords = transcribeAirtableToKeyFields(record.fields);
-    console.log(transcribedRecords);
     this.setState(state => ({
       ...state,
       data: {
@@ -182,9 +178,7 @@ export default class App extends React.Component<Props, State> {
 
   initialQuery = () => {
     const query = this.constructQuery();
-    console.log(query);
     if (query && this.base) {
-      console.log('making query');
       this.base('Table 1').select({
         // Selecting the first 3 records in Grid view:
         filterByFormula: query,
@@ -296,13 +290,13 @@ export default class App extends React.Component<Props, State> {
         "id": this.state.data[username].id,
         "fields": {
           "IG Handle": username,
-          "Lead Type": [leadType],
+          "Lead Type": leadType,
           "Notes": notes,
           "Value Piece Sent": valuePieceSent ? [valuePieceSent] : null,
           "Program Match": programMatch,
-        }
+        },
       }
-    ], function(err:any, records:Airtable.Record<any>[]) {
+    ], { typecast: true }, function(err:any, records:Airtable.Record<any>[]) {
       if (err) {
         console.error(err);
         return;

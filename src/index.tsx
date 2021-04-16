@@ -19,7 +19,7 @@ interface AirtableRecord {
   entryMonth: string; // Month
   firstContactedDate: Date;
   followUpDate: Date;
-  leadType: string[];
+  leadType: string;
 }
 
 let finalRecords: Record<string, Record<string, any>> = {};
@@ -96,5 +96,4 @@ let renderInList = () => {
 
 setTimeout(() => {
   renderInList();
-  console.log('rendered');
 }, 3000)

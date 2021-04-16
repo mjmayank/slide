@@ -124,3 +124,7 @@ button.saveLead {
   color: white!important;
   margin-top: 4px;
 }
+
+.combobox {
+  flex-direction: row;
+}

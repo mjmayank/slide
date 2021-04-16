@@ -1,5 +1,11 @@
-import React from 'react';
-import { Select, Textarea as EvergreenTextarea, TextInput } from 'evergreen-ui';
+import React, { useState } from 'react';
+import {
+  Select,
+  Textarea as EvergreenTextarea,
+  TextInput,
+  Combobox,
+  Autocomplete,
+} from 'evergreen-ui';
 
 interface Props {
   leadType: string;
@@ -37,6 +43,7 @@ const PROGRAM_MATCH = [
   'Course',
   'Flirting Forward',
   'Intensive',
+  'Add New'
 ];
 
 const VALUE_PIECE = [
@@ -47,6 +54,8 @@ const VALUE_PIECE = [
 ];
 
 function App(props:Props) {
+  const [programMatchInput, setProgramMatchInput] = useState(props.programMatch || '');
+
   return (
     <div>
       <div className='lead-section'>
@@ -64,13 +73,42 @@ function App(props:Props) {
       </div>
       <div className='lead-section'>
         <div className='lead-label'>Program Match</div>
-        <Select
-          value={props.programMatch ? props.programMatch : ''}
-          onChange={ e => props.setProgramMatch(e.target.value as string) }
+        <Autocomplete
+          allowOtherValues
+          onChange={ value => {
+            if(value === 'Add New') {
+              value = programMatchInput;
+            }
+            props.setProgramMatch(value as string);
+            return value;
+          } }
+          items={ PROGRAM_MATCH }
+          itemToString={ item => {
+            if(item === 'Add New') {
+              return '+ Add ' + programMatchInput
+            }
+            return item;
+          } }
         >
-          { PROGRAM_MATCH.map(leadType => (<option key={leadType} value={leadType}>{ leadType }</option>))}
-        </Select>
-        </div>
+          {(autoCompleteProps) => {
+            return (
+              <TextInput
+                placeholder="Program Match"
+                ref={autoCompleteProps.getRef}
+                {...autoCompleteProps.getInputProps({
+                  onFocus: () => {
+                    autoCompleteProps.openMenu()
+                  },
+                  onChange: (e:any) => {
+                    setProgramMatchInput(e.target.value);
+                  }
+                })}
+                value={autoCompleteProps.inputValue}
+              />
+            )
+          }}
+        </Autocomplete>
+      </div>
       <div className='lead-section'>
         <div className='lead-label'>Value Piece Sent</div>
         <Select
@@ -89,3 +127,10 @@ function App(props:Props) {
 }
 
 export default App;
+
+
+// <Pane height={some height} width={someWidth} display=“flex” flexDirection=“column”>
+// <Header> <-- this shouldn’t grow or shrink
+// <List /> <-- this should grow to fill all available space, overflowY=“auto”
+// <Footer /> <-- this shouldn’t grow or shrink. Fixed height
+// </Pane>
