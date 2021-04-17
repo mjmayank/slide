@@ -6,7 +6,7 @@ import amplitude from 'amplitude-js';
 import { StateContext, URL_UPDATED_EVENT, transcribeAirtableToKeyFields } from "./index.tsx";
 import Tag from './tag.tsx';
 import Setup from './Setup';
-import { Dialog } from 'evergreen-ui';
+import { Dialog, toaster } from 'evergreen-ui';
 
 const AIRTABLE_API_KEY = 'airtable_private_key';
 const AIRTABLE_BASE_ID_KEY = 'airtable_base'
@@ -298,6 +298,7 @@ export default class App extends React.Component<Props, State> {
       }
     ], { typecast: true }, function(err:any, records:Airtable.Record<any>[]) {
       if (err) {
+        toaster.danger('There was an error saving your lead')
         console.error(err);
         return;
       }
@@ -343,8 +344,9 @@ export default class App extends React.Component<Props, State> {
           "Program Match": programMatch,
         }
       }
-    ], function(err: any, records: any) {
+    ], { typecast: true }, function(err: any, records: any) {
       if (err) {
+        toaster.danger('There was an error saving your lead')
         console.error(err);
         return;
       }
