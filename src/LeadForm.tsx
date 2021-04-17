@@ -51,10 +51,12 @@ const VALUE_PIECE = [
   'Freebie',
   'Video',
   'Facebook Group',
+  'Add New'
 ];
 
 function App(props:Props) {
   const [programMatchInput, setProgramMatchInput] = useState(props.programMatch || '');
+  const [valuePieceInput, setValuePieceInput] = useState(props.valuePieceSent || '');
 
   return (
     <div>
@@ -71,6 +73,9 @@ function App(props:Props) {
           { LEAD_TYPES.map(leadType => (<option key={leadType} value={leadType}>{ leadType }</option>))}
         </Select>
       </div>
+
+
+
       <div className='lead-section'>
         <div className='lead-label'>Program Match</div>
         <Autocomplete
@@ -79,13 +84,14 @@ function App(props:Props) {
             if(value === 'Add New') {
               value = programMatchInput;
             }
+            setProgramMatchInput(value);
             props.setProgramMatch(value as string);
             return value;
           } }
           items={ PROGRAM_MATCH }
           itemToString={ item => {
             if(item === 'Add New') {
-              return '+ Add ' + programMatchInput
+              return `+ Add '${programMatchInput}'`
             }
             return item;
           } }
@@ -103,21 +109,57 @@ function App(props:Props) {
                     setProgramMatchInput(e.target.value);
                   }
                 })}
-                value={autoCompleteProps.inputValue}
+                value={programMatchInput}
               />
             )
           }}
         </Autocomplete>
       </div>
+
+
+
       <div className='lead-section'>
         <div className='lead-label'>Value Piece Sent</div>
-        <Select
-          value={props.valuePieceSent ? props.valuePieceSent : ''}
-          onChange={ e => props.setValuePieceSent(e.target.value as string) }
+        <Autocomplete
+          allowOtherValues
+          onChange={ value => {
+            console.log('onchange', value);
+            if(value === 'Add New') {
+              value = valuePieceInput;
+            }
+            setValuePieceInput(value);
+            props.setValuePieceSent(value as string);
+            return value;
+          } }
+          items={ VALUE_PIECE }
+          itemToString={ item => {
+            if(item === 'Add New') {
+              return `+ Add '${valuePieceInput}'`
+            }
+            return item;
+          } }
         >
-          { VALUE_PIECE.map(leadType => (<option key={leadType} value={leadType}>{ leadType }</option>))}
-        </Select>
+          {(autoCompleteProps) => {
+            return (
+              <TextInput
+                placeholder="Value Piece Sent"
+                ref={autoCompleteProps.getRef}
+                {...autoCompleteProps.getInputProps({
+                  onFocus: () => {
+                    autoCompleteProps.openMenu()
+                  },
+                  onChange: (e:any) => {
+                    setValuePieceInput(e.target.value);
+                  }
+                })}
+                value={valuePieceInput}
+              />
+            )
+          }}
+        </Autocomplete>
       </div>
+
+
       <div className='lead-section'>
         <div className='lead-label'>Notes</div>
         <EvergreenTextarea value={props.notes} onChange={ (e:any) => props.setNotes(e.target.value as string) }></EvergreenTextarea>
@@ -127,10 +169,3 @@ function App(props:Props) {
 }
 
 export default App;
-
-
-// <Pane height={some height} width={someWidth} display=“flex” flexDirection=“column”>
-// <Header> <-- this shouldn’t grow or shrink
-// <List /> <-- this should grow to fill all available space, overflowY=“auto”
-// <Footer /> <-- this shouldn’t grow or shrink. Fixed height
-// </Pane>

@@ -334,7 +334,7 @@ export default class App extends React.Component<Props, State> {
         "fields": {
           "First Name": name,
           "IG Handle": username,
-          "Lead Type": [leadType],
+          "Lead Type": leadType,
           "Entry Month": MONTHS[today.getMonth()],
           "First Contacted": today.toISOString().split('T')[0],
           "Follow Up": followUp.toISOString().split('T')[0],
