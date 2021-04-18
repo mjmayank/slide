@@ -39,6 +39,7 @@ function App(props:Props) {
                       amplitude.getInstance().logEvent('template_used');
                       const textArea = document.querySelector('[placeholder="Message..."]');
                       (textArea as HTMLTextAreaElement).value = template.text;
+                      (textArea as HTMLTextAreaElement)?.focus();
                       close();
                     } }
                   >
