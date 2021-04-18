@@ -37,9 +37,15 @@ function App(props:Props) {
                     key={ `${template.title}-${template.text}`}
                     onSelect={() => {
                       amplitude.getInstance().logEvent('template_used');
-                      const textArea = document.querySelector('[placeholder="Message..."]');
-                      (textArea as HTMLTextAreaElement).value = template.text;
-                      (textArea as HTMLTextAreaElement)?.focus();
+                      const textArea: HTMLTextAreaElement | null = document.querySelector('[placeholder="Message..."]');
+                      if (textArea) {
+                        // Important, to make the text area transform after setting the value
+                        // https://stackoverflow.com/questions/23892547/what-is-the-best-way-to-trigger-onchange-event-in-react-js
+                        var nativeInputValueSetter = Object?.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value")?.set;
+                        nativeInputValueSetter?.call(textArea, template.text);
+                        var ev2 = new Event('input', { bubbles: true});
+                        textArea.dispatchEvent(ev2);
+                      }
                       close();
                     } }
                   >
