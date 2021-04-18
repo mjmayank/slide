@@ -6,7 +6,7 @@ import amplitude from 'amplitude-js';
 import { StateContext, URL_UPDATED_EVENT, transcribeAirtableToKeyFields } from "./index.tsx";
 import Tag from './tag.tsx';
 import Setup from './Setup';
-import TemplateEntry from './Template';
+import TemplateEntry, { TEMPLATE_SYNC_KEY, Template } from './Template';
 import { Dialog, toaster } from 'evergreen-ui';
 
 const AIRTABLE_API_KEY = 'airtable_private_key';
@@ -40,9 +40,10 @@ interface State {
   currentUser: string;
   data: Record<string, AirtableRecord>;
   emailAddress: string;
-  setData(username: string, value: AirtableRecord): void; 
-  username: string | null;
   isOnboardingShown: boolean;
+  setData(username: string, value: AirtableRecord): void; 
+  templates: Template[];
+  username: string | null;
 }
 
 interface ChromeSyncResult {
@@ -70,12 +71,13 @@ export default class App extends React.Component<Props, State> {
     this.state = {
       apiKey: '',
       baseId: '',
+      currentUser,
       data: props.finalRecords,
       emailAddress: '',
-      setData: this.setData,
-      username: null,
-      currentUser,
       isOnboardingShown: false,
+      setData: this.setData,
+      templates: [],
+      username: null,
     }
   }
 
@@ -125,6 +127,17 @@ export default class App extends React.Component<Props, State> {
     });
   }
 
+  initializeTemplates = () => {
+    chrome.storage.sync.get(TEMPLATE_SYNC_KEY, result => {
+      console.log(result);
+      console.log(result[TEMPLATE_SYNC_KEY]);
+      this.setState(state => ({
+        ...state,
+        templates: (result[TEMPLATE_SYNC_KEY] as Template[]),
+      }));
+    });
+  }
+
   saveAirtableValues = (apiKey: string, baseId: string, emailAddress: string) => {
     chrome.storage.sync.set({
       [AIRTABLE_API_KEY]: apiKey,
@@ -141,6 +154,7 @@ export default class App extends React.Component<Props, State> {
   componentDidMount() {
     amplitude.getInstance().logEvent('viewed_instagram', { 'url': window.location.href, 'username': this.state.currentUser });
     this.initializeAirtable();
+    this.initializeTemplates();
     chrome.runtime.onMessage.addListener(this.handleMessage);
 
     const targetNode = document.querySelector('.N9abW');
@@ -413,7 +427,7 @@ export default class App extends React.Component<Props, State> {
           })
         }
         { username && usernameNode && ReactDom.createPortal(<Tag username={ username } record={ this.state.data[username] } addToAirtable={this.addToAirtable}></Tag>, usernameNode) }
-        { templateNode && ReactDom.createPortal(<TemplateEntry />, templateNode) }
+        { templateNode && ReactDom.createPortal(<TemplateEntry templates={ this.state.templates } />, templateNode) }
       </StateContext.Provider>
     )
   }

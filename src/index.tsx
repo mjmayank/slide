@@ -84,7 +84,6 @@ let renderInList = () => {
   const node = document.querySelector('body');
   if (node) {
     const root = node.appendChild(document.createElement('div'));
-    root.id = 'react-root'
     ReactDOM.render(
       <React.StrictMode>
         <Main finalRecords={ finalRecords }/>
