@@ -128,3 +128,8 @@ button.saveLead {
 .combobox {
   flex-direction: row;
 }
+
+.template-button-img {
+  height: 24px;
+  width: 24px;
+}

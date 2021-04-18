@@ -6,6 +6,7 @@ import amplitude from 'amplitude-js';
 import { StateContext, URL_UPDATED_EVENT, transcribeAirtableToKeyFields } from "./index.tsx";
 import Tag from './tag.tsx';
 import Setup from './Setup';
+import TemplateEntry from './Template';
 import { Dialog, toaster } from 'evergreen-ui';
 
 const AIRTABLE_API_KEY = 'airtable_private_key';
@@ -368,6 +369,17 @@ export default class App extends React.Component<Props, State> {
 
     const usernameNode = this.getDirectElementForUsername();
 
+    let templateNode: HTMLElement | null = document.getElementById('template-button');
+    if(!templateNode) {
+      templateNode = document.createElement('button');
+      templateNode.className = 'wpO6b';
+      templateNode.id = 'template-button';
+      const addPicButton = document.querySelector('[aria-label="Add Photo or Video"]')?.parentElement?.parentElement;
+      if (addPicButton) {
+        addPicButton!.parentElement?.insertBefore(templateNode, addPicButton!);
+      }
+    }
+
     return (
       <StateContext.Provider value={this.state}>
         { <Dialog
@@ -401,6 +413,7 @@ export default class App extends React.Component<Props, State> {
           })
         }
         { username && usernameNode && ReactDom.createPortal(<Tag username={ username } record={ this.state.data[username] } addToAirtable={this.addToAirtable}></Tag>, usernameNode) }
+        { templateNode && ReactDom.createPortal(<TemplateEntry />, templateNode) }
       </StateContext.Provider>
     )
   }

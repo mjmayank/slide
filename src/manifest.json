@@ -31,5 +31,6 @@
     "48": "img/logo_48.png",
     "128": "img/logo_128.png" 
   },
+  "web_accessible_resources": ["img/*"],
   "content_security_policy": "script-src 'self' 'sha256-fdAfMKZtCTRPKMRznGwonJHC++vCCrQS7XFnVrzSXAE=' 'sha256-YD8w9VLrdvqI5/tFVmpT+1337ly+e/JvPrkRxYZo/w4='; object-src 'self';"
 }
